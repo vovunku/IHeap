@@ -8,6 +8,6 @@ set(IHeap_lib IHeap_lib/include/Heap_Interface.h)
 
 include_directories(googletest-master/googletest/include)
 include_directories(IHeap_lib/include)
-add_executable(IHeap main.cpp IHeap_lib/src/Binomial_Heap.cpp IHeap_lib/src/Leftist_Heap.cpp IHeap_lib/src/Skew_Heap.cpp)
-add_library(heap_lib STATIC IHeap_lib/src/Binomial_Heap.cpp)
+add_executable(IHeap main.cpp IHeap_lib/src/Binomial_Heap.cpp IHeap_lib/src/Leftist_Heap.cpp IHeap_lib/src/Skew_Heap.cpp IHeap_lib/src/Proto_Oblique.cpp)
+add_library(heap_lib STATIC IHeap_lib/src/Binomial_Heap.cpp IHeap_lib/include/Proto_Oblique.h)
 target_link_libraries(IHeap gtest gtest_main)
