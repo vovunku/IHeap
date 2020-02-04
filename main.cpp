@@ -30,7 +30,6 @@ void my_random_test(Heap_Type* Heaps) {
         heap_id = gen_number(0, MAX_HEAPS);
         if(operation_key == 0){
             int key = gen_number(0, MAX_KEY);
-//            std::cout <<"A["<< heap_id << "].insert("  << key << ");\n";
             Heaps[heap_id].insert(key);
             Ideal_Heaps[heap_id].push_back(key);
             std::push_heap(Ideal_Heaps[heap_id].begin(), Ideal_Heaps[heap_id].end(), std::greater<int>());
@@ -38,7 +37,6 @@ void my_random_test(Heap_Type* Heaps) {
         }else if(operation_key == 1){
             int another_head_id = gen_number(0, MAX_HEAPS);
             if(heap_id != another_head_id){
-//                std::cout<<"A[" << heap_id << "].meld(A["<< another_head_id << "]);\n";
                 Heaps[heap_id].meld(Heaps[another_head_id]);
                 Ideal_Heaps[heap_id].insert(Ideal_Heaps[heap_id].begin(), Ideal_Heaps[another_head_id].begin(), Ideal_Heaps[another_head_id].end());
                 std::make_heap(Ideal_Heaps[heap_id].begin(), Ideal_Heaps[heap_id].end(), std::greater<int>());
@@ -49,12 +47,10 @@ void my_random_test(Heap_Type* Heaps) {
             }
         }else if(operation_key == 2){
             if(Heap_Elements_Quantity[heap_id] >= 1){
-//                std::cout << "A[" << heap_id << "].get_min();" << "\n";
                 ASSERT_EQ(Heaps[heap_id].get_min(), Ideal_Heaps[heap_id].front());
             }
         }else if(operation_key == 3){
             if(Heap_Elements_Quantity[heap_id] >= 1){
-//                std::cout << "A[" << heap_id << "].extract_min();" << "\n";
                 Heaps[heap_id].extract_min();
                 std::pop_heap(Ideal_Heaps[heap_id].begin(), Ideal_Heaps[heap_id].end(), std::greater<int>());
                 Ideal_Heaps[heap_id].pop_back();
