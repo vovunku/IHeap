@@ -138,7 +138,6 @@ void Binomial_Heap::insert(int value) {
     Binomial_Heap other(value);
     this->meld(other);
     _renew_min();
-    //other._head = nullptr;
 }
 
 int Binomial_Heap::get_min() const{
@@ -167,7 +166,6 @@ void Binomial_Heap::extract_min() {
     delete _min_element;
     (*this).meld(other);
     (*this)._renew_min();
-    //other._head = nullptr;
 }
 
 Binomial_Heap::Binomial_Tree_Node *Binomial_Heap::_find_min() {
