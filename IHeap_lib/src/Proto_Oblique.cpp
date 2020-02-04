@@ -12,10 +12,6 @@ Proto_Oblique::Oblique_Node::Oblique_Node(int value){
 Proto_Oblique::Proto_Oblique(){
     _head = nullptr;
 }
-/*
-Proto_Oblique::Proto_Oblique(int value){
-    _head = new Oblique_Node(value);
-}*/
 
 void Proto_Oblique::_delete_tree(Oblique_Node* node){
     if(node != nullptr){
@@ -56,11 +52,6 @@ void Proto_Oblique::meld(Heap_Interface& other){
     this->_head = this->_head->meld(other_Skew._head);
     other_Skew._head = nullptr;
 }
-
-/*void Proto_Oblique::insert(int value) {
-    Proto_Oblique other(value);
-    this->meld(other);
-}*/
 
 int Proto_Oblique::get_min() const{
     if(this->_head == nullptr){
