@@ -1,13 +1,49 @@
+  
 cmake_minimum_required(VERSION 3.15)
-project(IHeap)
+project(MergeableHeaps)
 
-set(CMAKE_CXX_STANDARD 14)
-add_subdirectory(googletest-master)
+set(CMAKE_CXX_STANDARD 17)
 
-set(IHeap_lib IHeap_lib/include/Heap_Interface.h)
+# Download and unpack googletest at configure time
+configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
+execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+        RESULT_VARIABLE result
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
+if(result)
+    message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+endif()
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+        RESULT_VARIABLE result
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
+if(result)
+    message(FATAL_ERROR "Build step for googletest failed: ${result}")
+endif()
 
-include_directories(googletest-master/googletest/include)
-include_directories(IHeap_lib/include)
+# Prevent overriding the parent project's compiler/linker
+# settings on Windows
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+# Add googletest directly to our build. This defines
+# the gtest and gtest_main targets.
+add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
+        ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
+        EXCLUDE_FROM_ALL)
+
+# The gtest/gtest_main targets carry header search path
+# dependencies automatically when using CMake 2.8.11 or
+# later. Otherwise we have to add them here ourselves.
+if (CMAKE_VERSION VERSION_LESS 2.8.11)
+    include_directories("${gtest_SOURCE_DIR}/include")
+endif()
+
+# Now simply link against gtest or gtest_main as needed. Eg
 add_executable(IHeap main.cpp IHeap_lib/src/Binomial_Heap.cpp IHeap_lib/src/Leftist_Heap.cpp IHeap_lib/src/Skew_Heap.cpp IHeap_lib/src/Proto_Oblique.cpp)
-add_library(heap_lib STATIC IHeap_lib/src/Binomial_Heap.cpp IHeap_lib/include/Proto_Oblique.h)
-target_link_libraries(IHeap gtest gtest_main)
+target_link_libraries(IHeap gtest_main)
+
+# Link all libs
+include_directories(IHeap_lib/include)
+include_directories(IHeap_lib/src)
+file(GLOB SOURCES "IHeap_lib/src/*.cpp")
+
+enable_testing()
+add_test(NAME main_test COMMAND IHeapLib)
