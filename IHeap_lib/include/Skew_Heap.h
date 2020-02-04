@@ -1,31 +1,21 @@
 #ifndef IHEAP_SKEW_HEAP_H
 #define IHEAP_SKEW_HEAP_H
 
-#include <Heap_Interface.h>
+#include <Proto_Oblique.h>
 
-class Skew_Heap : public Heap_Interface{
+class Skew_Heap : public Proto_Oblique{
 public:
-    Skew_Heap();
+    Skew_Heap() : Proto_Oblique::Proto_Oblique(){};
     Skew_Heap(int value);
-    void insert(int value) override ;
-    int get_min() const override ;
-    void extract_min() override ;
-    void meld(Heap_Interface & other) override ;
-    ~Skew_Heap();
+    virtual void insert(int value) override;
 private:
-    class Skew_Node{
+    class Skew_Node : public Oblique_Node{
     public:
-        int key;
-        Skew_Node *left_child;
-        Skew_Node *right_child;
-
-        Skew_Node(int value);
-        Skew_Node* meld(Skew_Node* other);
+        Skew_Node(int value) : Proto_Oblique::Oblique_Node(value){};
+        void invariant() override;
     };
-
-    Skew_Node* _head;
-
-    void _delete_tree(Skew_Node* node);
+protected:
+    Skew_Node* create_node(int value) override;
 };
 
 #endif //IHEAP_SKEW_HEAP_H

@@ -1,32 +1,22 @@
 #ifndef IHEAP_LEFTIST_HEAP_H
 #define IHEAP_LEFTIST_HEAP_H
 
-#include <Heap_Interface.h>
+#include <Proto_Oblique.h>
 
-class Leftist_Heap : public Heap_Interface{
+class Leftist_Heap : public Proto_Oblique{
 public:
-    Leftist_Heap();
+    Leftist_Heap() : Proto_Oblique::Proto_Oblique(){};
     Leftist_Heap(int value);
-    void insert(int value) override ;
-    int get_min() const override ;
-    void extract_min() override ;
-    void meld(Heap_Interface & other) override ;
-    ~Leftist_Heap();
+    virtual void insert(int value) override;
 private:
-    class Leftist_Node{
+    class Leftist_Node : public Oblique_Node{
     public:
-        int key;
         int rank;
-        Leftist_Node *left_child;
-        Leftist_Node *right_child;
-
-        Leftist_Node(int value);
-        Leftist_Node* meld(Leftist_Node* other);
+        Leftist_Node(int value) : Proto_Oblique::Oblique_Node(value){rank = 0;};
+        void invariant() override;
     };
-
-    Leftist_Node* _head;
-
-    void _delete_tree(Leftist_Node* node);
+protected:
+    Leftist_Node* create_node(int value) override;
 };
 
 #endif //IHEAP_LEFTIST_HEAP_H

@@ -1,3 +1,4 @@
+  
 cmake_minimum_required(VERSION 3.15)
 project(MergeableHeaps)
 
@@ -36,7 +37,7 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
 endif()
 
 # Now simply link against gtest or gtest_main as needed. Eg
-add_executable(IHeap main.cpp IHeap_lib/src/Binomial_Heap.cpp IHeap_lib/src/Leftist_Heap.cpp IHeap_lib/src/Skew_Heap.cpp)
+add_executable(IHeap main.cpp IHeap_lib/src/Binomial_Heap.cpp IHeap_lib/src/Leftist_Heap.cpp IHeap_lib/src/Skew_Heap.cpp IHeap_lib/src/Proto_Oblique.cpp)
 target_link_libraries(IHeap gtest_main)
 
 # Link all libs

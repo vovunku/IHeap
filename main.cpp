@@ -1,6 +1,7 @@
 #include <Binomial_Heap.h>
 #include <Leftist_Heap.h>
 #include <Skew_Heap.h>
+#include <Proto_Oblique.h>
 
 #include <gtest/gtest.h>
 #include <cstdlib>
@@ -11,7 +12,7 @@
 #include <deque>
 
 const unsigned int MAX_HEAPS = 100;
-const unsigned int MAX_OPERATIONS = 1e5;
+const unsigned int MAX_OPERATIONS = 1e3;
 const unsigned int MAX_KEY = 1000;
 
 int gen_number(int from, int to){
@@ -29,7 +30,6 @@ void my_random_test(Heap_Type* Heaps) {
         heap_id = gen_number(0, MAX_HEAPS);
         if(operation_key == 0){
             int key = gen_number(0, MAX_KEY);
-//            std::cout <<"A["<< heap_id << "].insert("  << key << ");\n";
             Heaps[heap_id].insert(key);
             Ideal_Heaps[heap_id].push_back(key);
             std::push_heap(Ideal_Heaps[heap_id].begin(), Ideal_Heaps[heap_id].end(), std::greater<int>());
@@ -37,7 +37,6 @@ void my_random_test(Heap_Type* Heaps) {
         }else if(operation_key == 1){
             int another_head_id = gen_number(0, MAX_HEAPS);
             if(heap_id != another_head_id){
-//                std::cout<<"A[" << heap_id << "].meld(A["<< another_head_id << "]);\n";
                 Heaps[heap_id].meld(Heaps[another_head_id]);
                 Ideal_Heaps[heap_id].insert(Ideal_Heaps[heap_id].begin(), Ideal_Heaps[another_head_id].begin(), Ideal_Heaps[another_head_id].end());
                 std::make_heap(Ideal_Heaps[heap_id].begin(), Ideal_Heaps[heap_id].end(), std::greater<int>());
@@ -48,12 +47,10 @@ void my_random_test(Heap_Type* Heaps) {
             }
         }else if(operation_key == 2){
             if(Heap_Elements_Quantity[heap_id] >= 1){
-//                std::cout << "A[" << heap_id << "].get_min();" << "\n";
                 ASSERT_EQ(Heaps[heap_id].get_min(), Ideal_Heaps[heap_id].front());
             }
         }else if(operation_key == 3){
             if(Heap_Elements_Quantity[heap_id] >= 1){
-//                std::cout << "A[" << heap_id << "].extract_min();" << "\n";
                 Heaps[heap_id].extract_min();
                 std::pop_heap(Ideal_Heaps[heap_id].begin(), Ideal_Heaps[heap_id].end(), std::greater<int>());
                 Ideal_Heaps[heap_id].pop_back();
@@ -63,16 +60,16 @@ void my_random_test(Heap_Type* Heaps) {
     }
 }
 
-TEST(Bin_Heap, Insertion){
-    Binomial_Heap A;
+template<typename Heap_Type>
+void test1(Heap_Type& A){
     A.insert(5);
     A.insert(1);
     A.insert(3);
     ASSERT_EQ(A.get_min(), 1);
 }
 
-TEST(Bin_Heap, Execution){
-    Binomial_Heap A;
+template<typename Heap_Type>
+void test2(Heap_Type& A){
     A.insert(5);
     A.insert(7);
     A.insert(3);
@@ -83,8 +80,8 @@ TEST(Bin_Heap, Execution){
     ASSERT_EQ(A.get_min(), 5);
 }
 
-TEST(Bin_Heap, Equals){
-    Binomial_Heap A;
+template<typename Heap_Type>
+void test3(Heap_Type& A){
     A.insert(5);
     A.insert(7);
     A.insert(5);
@@ -102,8 +99,8 @@ TEST(Bin_Heap, Equals){
     ASSERT_EQ(A.get_min(), 5);
 }
 
-TEST(Bin_Heap, Merge){
-    Binomial_Heap A;
+template<typename Heap_Type>
+void test4(Heap_Type& A, Heap_Type& B, Heap_Type& C){
     A.insert(5);
     A.insert(7);
     A.insert(5);
@@ -112,7 +109,6 @@ TEST(Bin_Heap, Merge){
     A.insert(4);
     A.insert(1);
     A.insert(5);
-    Binomial_Heap B;
     B.insert(5);
     B.insert(7);
     B.insert(5);
@@ -130,8 +126,48 @@ TEST(Bin_Heap, Merge){
     ASSERT_EQ(A.get_min(), 5);
     A.meld(B);
     ASSERT_EQ(A.get_min(), 1);
-    Binomial_Heap C;
     A.meld(C);
+}
+
+template<typename Heap_Type>
+void capacity_test(Heap_Type& A){
+    std::vector<int>Ideal_Heap;
+    int key;
+    for(int i = 0; i < MAX_OPERATIONS + 1; ++i){
+        key = gen_number(0, MAX_KEY);
+        Ideal_Heap.push_back(key);
+        std::push_heap(Ideal_Heap.begin(), Ideal_Heap.end(), std::greater<int>());
+        A.insert(key);
+        ASSERT_EQ(Ideal_Heap.front(), A.get_min());
+    }
+    for(int i = 0; i < MAX_OPERATIONS; ++i){
+        std::pop_heap(Ideal_Heap.begin(), Ideal_Heap.end(), std::greater<int>());
+        Ideal_Heap.pop_back();
+        A.extract_min();
+        ASSERT_EQ(Ideal_Heap.front(), A.get_min());
+    }
+}
+
+TEST(Bin_Heap, Insertion){
+    Binomial_Heap A;
+    test1(A);
+}
+
+TEST(Bin_Heap, Execution){
+    Binomial_Heap A;
+    test2(A);
+}
+
+TEST(Bin_Heap, Equals){
+    Binomial_Heap A;
+    test3(A);
+}
+
+TEST(Bin_Heap, Merge){
+    Binomial_Heap A;
+    Binomial_Heap B;
+    Binomial_Heap C;
+    test4(A, B, C);
 }
 
 TEST(Bin_Heap, Random_Tests){
@@ -141,92 +177,32 @@ TEST(Bin_Heap, Random_Tests){
     delete [] A;
 }
 
-TEST(Bin_Heap, test1){
+TEST(Bin_Heap, capacity_test){
     Binomial_Heap A;
-    A.insert(9);
-    A.extract_min();
-    A.insert(3);
-    A.extract_min();
-    A.insert(4);
-    A.insert(1);
-    A.get_min();
-    A.extract_min();
-    A.insert(0);
-    A.insert(5);
-    A.extract_min();
-    A.insert(9);
-    ASSERT_EQ(4,A.get_min());
+    std::srand(unsigned(std::time(0)));
+    capacity_test(A);
 }
 
 TEST(Leftist_Heap, Insertion){
     Leftist_Heap A;
-    A.insert(5);
-    A.insert(1);
-    A.insert(3);
-    ASSERT_EQ(A.get_min(), 1);
+    test1(A);
 }
 
 TEST(Leftist_Heap, Execution){
     Leftist_Heap A;
-    A.insert(5);
-    A.insert(7);
-    A.insert(3);
-    A.insert(1);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 3);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 5);
+    test2(A);
 }
 
 TEST(Leftist_Heap, Equals){
     Leftist_Heap A;
-    A.insert(5);
-    A.insert(7);
-    A.insert(5);
-    A.insert(4);
-    A.insert(7);
-    A.insert(4);
-    A.insert(1);
-    A.insert(5);
-    ASSERT_EQ(A.get_min(), 1);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 4);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 4);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 5);
+    test3(A);
 }
 
 TEST(Leftist_Heap, Merge){
     Leftist_Heap A;
-    A.insert(5);
-    A.insert(7);
-    A.insert(5);
-    A.insert(4);
-    A.insert(7);
-    A.insert(4);
-    A.insert(1);
-    A.insert(5);
     Leftist_Heap B;
-    B.insert(5);
-    B.insert(7);
-    B.insert(5);
-    B.insert(4);
-    B.insert(7);
-    B.insert(4);
-    B.insert(1);
-    B.insert(5);
-    ASSERT_EQ(A.get_min(), 1);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 4);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 4);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 5);
-    A.meld(B);
-    ASSERT_EQ(A.get_min(), 1);
     Leftist_Heap C;
-    A.meld(C);
+    test4(A, B, C);
 }
 
 TEST(Leftist_Heap, Random_Tests){
@@ -236,75 +212,32 @@ TEST(Leftist_Heap, Random_Tests){
     delete [] A;
 }
 
+TEST(Leftist_Heap, capacity_test){
+    Leftist_Heap A;
+    std::srand(unsigned(std::time(0)));
+    capacity_test(A);
+}
+
 TEST(Skew_Heap, Insertion){
     Skew_Heap A;
-    A.insert(5);
-    A.insert(1);
-    A.insert(3);
-    ASSERT_EQ(A.get_min(), 1);
+    test1(A);
 }
 
 TEST(Skew_Heap, Execution){
     Skew_Heap A;
-    A.insert(5);
-    A.insert(7);
-    A.insert(3);
-    A.insert(1);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 3);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 5);
+    test2(A);
 }
 
 TEST(Skew_Heap, Equals){
     Skew_Heap A;
-    A.insert(5);
-    A.insert(7);
-    A.insert(5);
-    A.insert(4);
-    A.insert(7);
-    A.insert(4);
-    A.insert(1);
-    A.insert(5);
-    ASSERT_EQ(A.get_min(), 1);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 4);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 4);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 5);
+    test3(A);
 }
 
 TEST(Skew_Heap, Merge){
     Skew_Heap A;
-    A.insert(5);
-    A.insert(7);
-    A.insert(5);
-    A.insert(4);
-    A.insert(7);
-    A.insert(4);
-    A.insert(1);
-    A.insert(5);
     Skew_Heap B;
-    B.insert(5);
-    B.insert(7);
-    B.insert(5);
-    B.insert(4);
-    B.insert(7);
-    B.insert(4);
-    B.insert(1);
-    B.insert(5);
-    ASSERT_EQ(A.get_min(), 1);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 4);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 4);
-    A.extract_min();
-    ASSERT_EQ(A.get_min(), 5);
-    A.meld(B);
-    ASSERT_EQ(A.get_min(), 1);
     Skew_Heap C;
-    A.meld(C);
+    test4(A, B, C);
 }
 
 TEST(Skew_Heap, Random_Tests){
@@ -312,4 +245,10 @@ TEST(Skew_Heap, Random_Tests){
     Skew_Heap* A = new Skew_Heap[MAX_HEAPS];
     my_random_test(A);
     delete [] A;
+}
+
+TEST(Skew_Heap, capacity_test){
+    Skew_Heap A;
+    std::srand(unsigned(std::time(0)));
+    capacity_test(A);
 }

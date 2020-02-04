@@ -79,6 +79,7 @@ void Binomial_Heap::_add_heap_to_root_list(Binomial_Heap &other) {
     current_position_in_this = this->_head;
     Binomial_Tree_Node *current_position_in_other;
     current_position_in_other = other._head;
+
     while(current_position_in_this != nullptr && current_position_in_other != nullptr){
         if(current_position_in_this->degree > current_position_in_other->degree){
             iterator->make_other_stepbrother(current_position_in_other);
@@ -89,11 +90,13 @@ void Binomial_Heap::_add_heap_to_root_list(Binomial_Heap &other) {
         }
         iterator = iterator->right_sibling;
     }
+
     if(current_position_in_this != nullptr){
         iterator->make_other_stepbrother(current_position_in_this);
     }else if(current_position_in_other != nullptr){
         iterator->make_other_stepbrother(current_position_in_other);
     }
+
     this->_head = dummy_head.right_sibling;
 }
 
@@ -135,7 +138,6 @@ void Binomial_Heap::insert(int value) {
     Binomial_Heap other(value);
     this->meld(other);
     _renew_min();
-    //other._head = nullptr;
 }
 
 int Binomial_Heap::get_min() const{
@@ -164,7 +166,6 @@ void Binomial_Heap::extract_min() {
     delete _min_element;
     (*this).meld(other);
     (*this)._renew_min();
-    //other._head = nullptr;
 }
 
 Binomial_Heap::Binomial_Tree_Node *Binomial_Heap::_find_min() {
